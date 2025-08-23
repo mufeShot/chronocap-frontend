@@ -1,8 +1,8 @@
 import { useAuth } from '../composables/useAuth'
 
-interface FetchOpts extends RequestInit {
-  retryOn401?: boolean
-}
+interface FetchOpts extends RequestInit { retryOn401?: boolean }
+
+function maybeAddNgrokHeader(headers: HeadersInit): HeadersInit { return headers }
 
 let refreshInFlight: Promise<void> | null = null
 
@@ -20,10 +20,11 @@ async function ensureRefreshed() {
 export async function apiFetch(input: string, opts: FetchOpts = {}) {
   const auth = useAuth()
   const doReq = () => {
-    const headers: HeadersInit = {
+    let headers: HeadersInit = {
       ...(opts.headers || {}),
       ...(auth.accessToken.value ? { Authorization: `Bearer ${auth.accessToken.value}` } : {}),
     }
+    headers = maybeAddNgrokHeader(headers)
     return fetch(input, { ...opts, headers })
   }
 

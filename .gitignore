@@ -28,3 +28,7 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+
+# Environment local overrides (example file is committed as .env.example)
+.env
+.env.*.local

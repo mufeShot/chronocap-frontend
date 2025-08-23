@@ -11,6 +11,9 @@ const API_BASE = (() => {
   return 'http://localhost:3000'
 })()
 
+const isNgrok = /\.ngrok(-free)?\./i.test(API_BASE)
+const ngrokHeaders = isNgrok ? { 'ngrok-skip-browser-warning': '1' } : undefined
+
 type CreateOpts = { onProgress?: (pct: number) => void }
 
 interface AuthResponse {
@@ -121,6 +124,7 @@ async function postJSON<T>(path: string, body: unknown, token?: string): Promise
     headers: {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(ngrokHeaders || {}),
     },
     body: JSON.stringify(body),
   })
@@ -206,6 +210,7 @@ export const api = {
         xhr.onerror = () => reject(new Error('Network error'))
         xhr.open('POST', `${API_BASE}/capsules`)
         xhr.setRequestHeader('Authorization', `Bearer ${auth.accessToken.value}`)
+        if (ngrokHeaders) Object.entries(ngrokHeaders).forEach(([k, v]) => xhr.setRequestHeader(k, String(v)))
         xhr.send(form)
       })
       const raw = await promise
@@ -218,6 +223,7 @@ export const api = {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${auth.accessToken.value}`,
+          ...(ngrokHeaders || {}),
         },
         body: JSON.stringify({
           title: input.title,
@@ -254,7 +260,7 @@ export const api = {
     const auth = useAuth()
     if (!auth.accessToken.value) throw new Error('Not authenticated')
     const res = await fetch(`${API_BASE}/capsules`, {
-      headers: { Authorization: `Bearer ${auth.accessToken.value}` },
+      headers: { Authorization: `Bearer ${auth.accessToken.value}`, ...(ngrokHeaders || {}) },
     })
     if (!res.ok) throw new Error('Failed to fetch capsules')
     const data: unknown = await res.json().catch(() => [])
@@ -262,7 +268,7 @@ export const api = {
     return arr.map(normalizeCapsule)
   },
   async listPublicCapsules(): Promise<Capsule[]> {
-    const res = await fetch(`${API_BASE}/public/capsules`)
+    const res = await fetch(`${API_BASE}/public/capsules`, { headers: { ...(ngrokHeaders || {}) } })
     if (!res.ok) throw new Error('Failed to fetch public capsules')
     const data: unknown = await res.json().catch(() => [])
     const arr = extractCapsuleArray(data)
@@ -277,7 +283,10 @@ export const api = {
     const doFetch = async (path: string, needsAuth: boolean) => {
       try {
         const res = await fetch(`${API_BASE}${path}`, {
-          headers: needsAuth && hasToken ? { Authorization: `Bearer ${auth.accessToken.value}` } : undefined,
+          headers: {
+            ...(needsAuth && hasToken ? { Authorization: `Bearer ${auth.accessToken.value}` } : {}),
+            ...(ngrokHeaders || {}),
+          },
         })
         if (res.status === 404) return null
         if (res.status === 401 && needsAuth) return null
@@ -292,7 +301,7 @@ export const api = {
       // Call private first if we have a token; only fallback to public on 404.
       if (hasToken) {
         // Private first
-        const res = await apiFetch(`${API_BASE}/capsules/${encodeURIComponent(key)}`, { retryOn401: true })
+        const res = await apiFetch(`${API_BASE}/capsules/${encodeURIComponent(key)}`, { retryOn401: true, headers: { ...(ngrokHeaders || {}) } })
         if (res.status === 404) {
           let notFoundMsg = 'Capsule not found'
           try {
