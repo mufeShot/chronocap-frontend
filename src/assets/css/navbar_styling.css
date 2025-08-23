@@ -1,0 +1,38 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fff; /* or your desired background */
+  padding: 1rem 2rem;
+}
+
+.nav-left,
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.nav-logo {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+}
+
+.nav-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.nav-btn {
+  background: none;
+  border: none;
+  color: #007bff;
+  text-decoration: none;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.user-email {
+  margin-right: 1rem;
+}
