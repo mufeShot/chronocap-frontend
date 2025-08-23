@@ -3,7 +3,13 @@ import { useAuth } from '../composables/useAuth'
 import type { AuthUser } from '../composables/useAuth'
 import { apiFetch } from './apiFetch'
 
-const API_BASE = 'http://localhost:3000'
+// Resolve API base: use VITE_API_BASE if provided, else fall back to same origin (browser) or localhost for dev.
+const API_BASE = (() => {
+  const envBase = (import.meta as ImportMeta).env?.VITE_API_BASE
+  if (envBase && envBase.trim()) return envBase.replace(/\/$/, '')
+  if (typeof window !== 'undefined') return location.origin.replace(/\/$/, '')
+  return 'http://localhost:3000'
+})()
 
 type CreateOpts = { onProgress?: (pct: number) => void }
 
