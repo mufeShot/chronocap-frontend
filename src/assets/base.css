@@ -19,6 +19,17 @@
   --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
   --vt-c-text-dark-1: var(--vt-c-white);
   --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
+
+  /* Theme variables */
+  --bg-1: #0b1220;
+  --bg-2: #0f172a;
+  --surface: rgba(255, 255, 255, 0.06);
+  --surface-hover: rgba(255, 255, 255, 0.12);
+  --border: rgba(255, 255, 255, 0.08);
+  --text-1: #e5e7eb;
+  --text-2: #94a3b8;
+  --brand: #1abc9c;
+  --brand-2: #16a085;
 }
 
 /* semantic color variables for this project */
@@ -58,6 +69,16 @@
   font-weight: normal;
 }
 
+html,
+body {
+  min-height: 100%;
+}
+#app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
 body {
   min-height: 100vh;
   color: var(--color-text);
@@ -83,4 +104,35 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  background:
+    radial-gradient(1200px 600px at 70% 0%, var(--bg-2), transparent 70%),
+    linear-gradient(180deg, var(--bg-2) 0%, var(--bg-1) 65%, var(--bg-1) 100%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  color: var(--text-1);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(1600px 800px at 80% -10%, var(--bg-2) 0%, transparent 70%);
+  z-index: -1;
+}
+
+/* Container utility */
+.site-container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding-inline: 1.2rem;
+}
+
+/* Main spacing to clear sticky nav */
+.site-main {
+  padding-top: 80px;
 }
